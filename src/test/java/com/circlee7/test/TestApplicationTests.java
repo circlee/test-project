@@ -2,6 +2,7 @@ package com.circlee7.test;
 
 import com.circlee7.test.model.ProgramDTO;
 import com.circlee7.test.service.ProgramService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Slf4j
 public class TestApplicationTests {
 
 
@@ -30,14 +32,13 @@ public class TestApplicationTests {
 
     @Test(expected = EntityNotFoundException.class)
     public void test00_selectProgram_notFound(){
-        programService.selectProgram(11231L);
+        programService.selectProgram("prg0012");
     }
 
     @Test
     public void test01_saveProgram(){
 
         ProgramDTO programDTO = ProgramDTO.builder()
-                .prgmNumber(1L)
                 .prgmDescription("정보 상세")
                 .prgmInfo("정보")
                 .serviceRegion("경기도 파주시")
@@ -47,8 +48,9 @@ public class TestApplicationTests {
 
         programDTO = programService.saveProgram(programDTO);
 
-        ProgramDTO savedProgramDTO = programService.selectProgram(programDTO.getPrgmNumber());
+        ProgramDTO savedProgramDTO = programService.selectProgram(programDTO.getProgram());
 
+        log.debug("savedProgramInfo >> {}", savedProgramDTO);
         Assert.assertEquals(programDTO, savedProgramDTO);
 
     }

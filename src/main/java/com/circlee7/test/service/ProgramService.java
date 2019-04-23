@@ -7,5 +7,5 @@ public interface ProgramService {
 
     ProgramDTO saveProgram(ProgramDTO programDTO);
 
-    ProgramDTO selectProgram(Long programId);
+    ProgramDTO selectProgram(String programId);
 }

@@ -23,7 +23,7 @@ public class ProgramServiceImpl implements ProgramService {
     public ProgramDTO saveProgram(ProgramDTO programDTO) {
 
         Program program = Program.builder()
-                .id(programDTO.getPrgmNumber())
+                .id(programDTO.getProgram())
                 .prgmName(programDTO.getPrgmName())
                 .serviceRegion(programDTO.getServiceRegion())
                 .prgmInfo(programDTO.getPrgmInfo())
@@ -40,17 +40,17 @@ public class ProgramServiceImpl implements ProgramService {
 
         program = programRepository.save(program);
 
-        programDTO.setPrgmNumber(program.getId());
+        programDTO.setProgram(program.getId());
         return programDTO;
     }
 
     @Override
-    public ProgramDTO selectProgram(Long programId) {
+    public ProgramDTO selectProgram(String programId) {
 
         return programRepository.findById(programId)
                 .map( program -> {
                     return ProgramDTO.builder()
-                            .prgmNumber(program.getId())
+                            .program(program.getId())
                             .prgmName(program.getPrgmName())
                             .serviceRegion(program.getServiceRegion())
                             .prgmInfo(program.getPrgmInfo())

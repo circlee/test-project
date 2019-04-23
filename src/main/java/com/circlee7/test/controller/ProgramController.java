@@ -26,7 +26,7 @@ public class ProgramController {
 
     @ApiOperation("프로그램 조회")
     @GetMapping("/{programId}")
-    public ProgramDTO getProgram(@PathVariable("programId") Long id){
+    public ProgramDTO getProgram(@PathVariable("programId") String id){
         return programService.selectProgram(id);
     }
 

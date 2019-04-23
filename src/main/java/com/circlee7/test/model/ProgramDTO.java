@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 public class ProgramDTO {
 
 
-    private Long prgmNumber;
+    private String program;
 
     @NotEmpty
     private String prgmName;
