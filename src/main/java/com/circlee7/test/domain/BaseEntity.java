@@ -13,14 +13,16 @@ import java.time.LocalDateTime;
 public class BaseEntity implements Serializable {
 
 
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     private Long createdBy;
 
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
     private Long updatedBy;
 
 }

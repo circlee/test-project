@@ -1,7 +1,11 @@
 package com.circlee7.test;
 
+import com.circlee7.test.component.CsvParser;
+import com.circlee7.test.model.ProgramCsvDTO;
 import com.circlee7.test.model.ProgramDTO;
 import com.circlee7.test.service.ProgramService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -13,6 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(SpringRunner.class)
@@ -20,6 +27,9 @@ import javax.persistence.EntityNotFoundException;
 @Slf4j
 public class TestApplicationTests {
 
+
+    @Autowired
+    CsvParser csvParser;
 
     @Autowired
     ProgramService programService;
@@ -55,6 +65,34 @@ public class TestApplicationTests {
 
     }
 
+    @Test
+    public void test02_csvParseTest() throws IOException {
+
+        InputStream fileStream = getClass().getResourceAsStream("/sample/test.csv");
+
+        csvParser.read(HashMap.class, fileStream)
+                .stream()
+                .forEach(System.out::println);
+
+    }
+
+    @Test
+    public void test03_csvParseTest() throws IOException {
+
+        InputStream fileStream = getClass().getResourceAsStream("/sample/test.csv");
+
+        csvParser.read(ProgramCsvDTO.class, fileStream)
+                .stream()
+                .forEach(s -> {
+                    ObjectMapper om = new ObjectMapper();
+                    try {
+                        System.out.println(om.writeValueAsString(s));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+    }
 
 
 }
