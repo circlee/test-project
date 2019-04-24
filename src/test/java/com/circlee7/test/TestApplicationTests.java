@@ -1,11 +1,8 @@
 package com.circlee7.test;
 
 import com.circlee7.test.component.CsvParser;
-import com.circlee7.test.model.ProgramCsvDTO;
 import com.circlee7.test.model.ProgramDTO;
 import com.circlee7.test.service.ProgramService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -70,28 +67,24 @@ public class TestApplicationTests {
 
         InputStream fileStream = getClass().getResourceAsStream("/sample/test.csv");
 
-        csvParser.read(HashMap.class, fileStream)
-                .stream()
-                .forEach(System.out::println);
+        csvParser.read(HashMap.class, fileStream);
 
     }
 
     @Test
-    public void test03_csvParseTest() throws IOException {
+    public void test03_csvParseTestToDTO() throws IOException {
 
         InputStream fileStream = getClass().getResourceAsStream("/sample/test.csv");
 
-        csvParser.read(ProgramCsvDTO.class, fileStream)
-                .stream()
-                .forEach(s -> {
-                    ObjectMapper om = new ObjectMapper();
-                    try {
-                        System.out.println(om.writeValueAsString(s));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
+        csvParser.read(ProgramDTO.ProgramCsvDTO.class, fileStream);
+    }
 
+    @Test
+    public void test04_csvToBulkInsert() throws IOException {
+
+        InputStream fileStream = getClass().getResourceAsStream("/sample/test.csv");
+
+        programService.bulkInsertCSV(fileStream);
     }
 
 

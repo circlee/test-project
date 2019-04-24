@@ -1,9 +1,6 @@
 package com.circlee7.test.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -17,6 +14,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper=false)
 public class Program extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 7358242943473807765L;
@@ -49,8 +47,12 @@ public class Program extends BaseEntity implements Serializable {
     @Column(length = 3000)
     private String prgmDescription;
 
-
-    @ManyToMany(mappedBy = "programs")
+    @EqualsAndHashCode.Exclude
+    @ManyToMany()
+    @JoinTable(
+            name = "program_mapping",
+            joinColumns = @JoinColumn(name = "program_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "region_id", referencedColumnName = "id"))
     Set<Region> regionMapping;
 
 

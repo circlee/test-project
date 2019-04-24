@@ -1,9 +1,7 @@
 package com.circlee7.test.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -30,4 +28,13 @@ public class ProgramDTO {
 
     @NotEmpty
     private String prgmDescription;
+
+
+    @Data
+    @EqualsAndHashCode(callSuper=false)
+    @ToString(callSuper = true)
+    @JsonPropertyOrder({"number", "prgmName", "theme", "serviceRegion", "prgmInfo", "prgmDescription"})
+    public static class ProgramCsvDTO extends ProgramDTO {
+        private String number;
+    }
 }

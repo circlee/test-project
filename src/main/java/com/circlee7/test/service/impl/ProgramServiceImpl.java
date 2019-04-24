@@ -3,18 +3,20 @@ package com.circlee7.test.service.impl;
 import com.circlee7.test.Repository.ProgramRepository;
 import com.circlee7.test.component.CsvParser;
 import com.circlee7.test.domain.Program;
+import com.circlee7.test.domain.Region;
 import com.circlee7.test.exception.InCaseException;
-import com.circlee7.test.model.ProgramCsvDTO;
 import com.circlee7.test.model.ProgramDTO;
 import com.circlee7.test.service.ProgramService;
+import com.circlee7.test.service.RegionService;
+import com.circlee7.test.util.DtoTranformer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,18 +24,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProgramServiceImpl implements ProgramService {
 
+    private final RegionService regionService;
+
     private final ProgramRepository programRepository;
 
     private final CsvParser csvParser;
 
     @Override
     @Transactional
-    public void bulkInsertCSV(MultipartFile file) {
+    public void bulkInsertCSV(InputStream is) {
 
-        List<ProgramCsvDTO> csvDtoList = null;
+        List<ProgramDTO.ProgramCsvDTO> csvDtoList = null;
         try {
 
-            csvDtoList = csvParser.read(ProgramCsvDTO.class, file.getInputStream());
+            csvDtoList = csvParser.read(ProgramDTO.ProgramCsvDTO.class, is);
 
         } catch (IOException e) {
             throw new InCaseException(e.getCause());
@@ -43,7 +47,6 @@ public class ProgramServiceImpl implements ProgramService {
                 .ifPresent( dtoList -> {
                     dtoList.stream()
                             .forEach(dto -> {
-                                System.out.println(dto);
                                 saveProgram(dto);
                             });
                 });
@@ -60,35 +63,37 @@ public class ProgramServiceImpl implements ProgramService {
                 .prgmInfo(programDTO.getPrgmInfo())
                 .prgmDescription(programDTO.getPrgmDescription())
                 .theme(programDTO.getTheme())
+                .regionMapping(new HashSet<Region>(regionService.createOrGetRegionListByServiceRegionText(programDTO.getServiceRegion())))
                 .build();
 
 
-        // create/update info
-        program.setCreatedAt(LocalDateTime.now());
-        program.setCreatedBy(1L);
-        program.setUpdatedAt(LocalDateTime.now());
-        program.setUpdatedBy(1L);
-
         program = programRepository.save(program);
+
+
 
         programDTO.setProgram(program.getId());
         return programDTO;
     }
 
     @Override
+    @Transactional
+    public ProgramDTO updateProgram(ProgramDTO programDTO) {
+        Program program = programRepository.getOne(programDTO.getProgram());
+
+        return saveProgram(programDTO);
+    }
+
+    @Override
     public ProgramDTO selectProgram(String programId) {
 
         return programRepository.findById(programId)
-                .map( program -> {
-                    return ProgramDTO.builder()
-                            .program(program.getId())
-                            .prgmName(program.getPrgmName())
-                            .serviceRegion(program.getServiceRegion())
-                            .prgmInfo(program.getPrgmInfo())
-                            .prgmDescription(program.getPrgmDescription())
-                            .theme(program.getTheme())
-                            .build();
-                })
+                .map(DtoTranformer.PROGRAM_TO_DTO)
                 .orElseThrow(() -> new EntityNotFoundException());
+    }
+
+    @Override
+    @Transactional
+    public void deleteProgram(String programId) {
+        programRepository.deleteById(programId);
     }
 }

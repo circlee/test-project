@@ -1,15 +1,13 @@
 package com.circlee7.test.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -17,6 +15,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper=false)
 public class Region implements Serializable {
 
 
@@ -35,13 +34,18 @@ public class Region implements Serializable {
     @Column(nullable = false)
     private String regionName;
 
+    private String rootName;
 
-
-    @ManyToMany
-    @JoinTable(
-            name = "program_mapping",
-            joinColumns = @JoinColumn(name = "region_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "program_id", referencedColumnName = "id"))
+    @EqualsAndHashCode.Exclude
+    @ManyToMany(mappedBy = "regionMapping")
     Set<Program> programs;
+
+
+    public String getFullRegionName() {
+        return Optional.ofNullable(getRootName())
+                .map(s -> s + " ")
+                .orElse("")
+                + getRegionName();
+    }
 
 }
