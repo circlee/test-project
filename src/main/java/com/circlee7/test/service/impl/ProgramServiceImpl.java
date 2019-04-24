@@ -94,6 +94,13 @@ public class ProgramServiceImpl implements ProgramService {
     @Override
     @Transactional
     public void deleteProgram(String programId) {
-        programRepository.deleteById(programId);
+
+        Optional<Program> program = programRepository.findById(programId);
+        if(program.isPresent()) {
+            programRepository.deleteById(programId);
+        } else {
+            throw new EntityNotFoundException();
+        }
+
     }
 }
