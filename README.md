@@ -39,7 +39,14 @@
 ### 실행방법
 
 ```
-$> gradle bootRun
+
+$> gradle bootRun  
+ -- (서버포트 10080 로 지정되어있습니다.)
+
+OR
+
+gradle build
+java -jar ./build/libs/test-0.0.1-SNAPSHOT.jar --server.port=[PORT]
 ```
 
 --- 
