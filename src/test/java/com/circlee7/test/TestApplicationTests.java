@@ -1,5 +1,6 @@
 package com.circlee7.test;
 
+import com.circlee7.test.advice.ExceptionAdvice;
 import com.circlee7.test.component.CsvParser;
 import com.circlee7.test.controller.ProgramController;
 import com.circlee7.test.controller.RegionController;
@@ -22,7 +23,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class TestApplicationTests {
     @Autowired
     SearchController searchController;
 
-    ResponseEntityExceptionHandler exHandler = new ResponseEntityExceptionHandler() {};
+    ExceptionAdvice exHandler = new ExceptionAdvice();
 
     @Test
     public void contextLoads() {
@@ -171,6 +171,8 @@ public class TestApplicationTests {
     @Test
     public void test06_programApi_02updateProgram() throws Exception {
 
+        //insert
+        test06_programApi_01insertProgram();
 
         ProgramDTO dto = ProgramDTO.builder().prgmName("TEST")
                 .theme("소풍")
@@ -187,7 +189,26 @@ public class TestApplicationTests {
         ).andExpect(status().isOk());
     }
 
-    
+    @Test
+    public void test06_programApi_03deleteProgram() throws Exception {
+
+        //insert
+        test06_programApi_01insertProgram();
+
+        ProgramDTO dto = ProgramDTO.builder().prgmName("TEST")
+                .theme("소풍")
+                .serviceRegion("강원도 속초")
+                .prgmInfo("설악산")
+                .prgmDescription("설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요?")
+                .build();
+
+        ObjectMapper om = new ObjectMapper();
+
+        mockProgramControllerMvc.perform(delete("/programs/{programId}","prg0001"))
+                .andExpect(status().isOk());
+    }
+
+
 
 
 
