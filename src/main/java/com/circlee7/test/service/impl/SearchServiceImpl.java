@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -51,7 +52,7 @@ public class SearchServiceImpl implements SearchService {
 
             SearchRegionDTO.SearchRegionDTO_result result =  new SearchRegionDTO.SearchRegionDTO_result();
 
-            List<SearchRegionProgramDTO> programDTOList = r.getPrograms()
+            List<SearchRegionProgramDTO> programDTOList = Optional.ofNullable(r.getPrograms()).orElse(Collections.emptySet())
                     .stream()
                     .map( p -> {
                         return SearchRegionProgramDTO.builder()

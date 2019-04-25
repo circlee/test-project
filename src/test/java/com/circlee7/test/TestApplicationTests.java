@@ -23,6 +23,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import com.circlee7.test.model.SearchRegionDTO;
+import com.circlee7.test.util.CustomException;
+import org.springframework.test.annotation.Rollback;
+
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
@@ -36,8 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Slf4j
 @Transactional
+@Slf4j
 public class TestApplicationTests {
 
     private MockMvc mockProgramControllerMvc;
@@ -59,7 +63,8 @@ public class TestApplicationTests {
     @Autowired
     SearchController searchController;
 
-    ExceptionAdvice exHandler = new ExceptionAdvice();
+    @Autowired
+    ExceptionAdvice exHandler;
 
     @Test
     public void contextLoads() {
@@ -74,7 +79,7 @@ public class TestApplicationTests {
     }
 
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test(expected = CustomException.class)
     public void test00_selectProgram_notFound(){
         programService.selectProgram("prg0012");
     }
@@ -189,23 +194,28 @@ public class TestApplicationTests {
         ).andExpect(status().isOk());
     }
 
+    
     @Test
     public void test06_programApi_03deleteProgram() throws Exception {
+
+        mockProgramControllerMvc.perform(delete("/programs/{programId}","prg0001"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void test07_searchApi_01searchRegion() throws Exception {
 
         //insert
         test06_programApi_01insertProgram();
 
-        ProgramDTO dto = ProgramDTO.builder().prgmName("TEST")
-                .theme("소풍")
-                .serviceRegion("강원도 속초")
-                .prgmInfo("설악산")
-                .prgmDescription("설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요?")
-                .build();
+        SearchRegionDTO dto = SearchRegionDTO.builder().region("강원도").build();
 
         ObjectMapper om = new ObjectMapper();
 
-        mockProgramControllerMvc.perform(delete("/programs/{programId}","prg0001"))
-                .andExpect(status().isOk());
+        mockSearchControllerMvc.perform(post("/search/region")
+        .content(om.writeValueAsString(dto))
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        ).andExpect(status().isOk());
     }
 
 

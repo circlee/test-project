@@ -12,6 +12,8 @@ import com.circlee7.test.util.DtoTranformer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.circlee7.test.util.CustomException;
+import org.springframework.http.HttpStatus;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
@@ -88,18 +90,19 @@ public class ProgramServiceImpl implements ProgramService {
 
         return programRepository.findById(programId)
                 .map(DtoTranformer.PROGRAM_TO_DTO)
-                .orElseThrow(() -> new EntityNotFoundException());
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND));
     }
 
     @Override
     @Transactional
     public void deleteProgram(String programId) {
 
-        Optional<Program> program = programRepository.findById(programId);
-        if(program.isPresent()) {
-            programRepository.deleteById(programId);
+        Optional<Program> programOpt = programRepository.findById(programId);
+        Program program = programOpt.orElse(null);
+        if(program != null) {
+            programRepository.delete(program);
         } else {
-            throw new EntityNotFoundException();
+            throw new CustomException(HttpStatus.NOT_FOUND);
         }
 
     }
