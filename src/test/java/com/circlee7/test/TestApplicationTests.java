@@ -26,7 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.circlee7.test.model.SearchRegionDTO;
 import com.circlee7.test.util.CustomException;
 import org.springframework.test.annotation.Rollback;
-
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
@@ -47,6 +48,11 @@ public class TestApplicationTests {
     private MockMvc mockProgramControllerMvc;
     private MockMvc mockRegionControllerMvc;
     private MockMvc mockSearchControllerMvc;
+
+    private ObjectMapper om = new ObjectMapper();
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     CsvParser csvParser;
@@ -165,8 +171,6 @@ public class TestApplicationTests {
                 .prgmDescription("설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요?")
                 .build();
 
-        ObjectMapper om = new ObjectMapper();
-
         mockProgramControllerMvc.perform(post("/programs")
                 .content(om.writeValueAsString(dto))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -186,8 +190,6 @@ public class TestApplicationTests {
                 .prgmDescription("설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요?")
                 .build();
 
-        ObjectMapper om = new ObjectMapper();
-
         mockProgramControllerMvc.perform(put("/programs/{programId}","prg0001")
                 .content(om.writeValueAsString(dto))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -198,22 +200,36 @@ public class TestApplicationTests {
     @Test
     public void test06_programApi_03deleteProgram() throws Exception {
 
-        mockProgramControllerMvc.perform(delete("/programs/{programId}","prg0001"))
-                .andExpect(status().isNotFound());
+        ProgramDTO dto = ProgramDTO.builder().prgmName("TEST")
+                .theme("소풍")
+                .serviceRegion("강원도 속초")
+                .prgmInfo("설악산")
+                .prgmDescription("설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요?")
+                .build();
+
+        //insert
+        dto = programService.saveProgram(dto);
+
+        mockProgramControllerMvc.perform(delete("/programs/{programId}", dto.getProgram()))
+                .andExpect(status().isOk());
+
     }
 
     @Test
     public void test07_searchApi_01searchRegion() throws Exception {
 
+        ProgramDTO dto = ProgramDTO.builder().prgmName("TEST")
+        .theme("소풍")
+        .serviceRegion("강원도 속초")
+        .prgmInfo("설악산")
+        .prgmDescription("설악산은 왜 설악산이고, 신흥사는 왜 신흥사일까요?")
+        .build();
+
         //insert
-        test06_programApi_01insertProgram();
-
-        SearchRegionDTO dto = SearchRegionDTO.builder().region("강원도").build();
-
-        ObjectMapper om = new ObjectMapper();
+        dto = programService.saveProgram(dto);
 
         mockSearchControllerMvc.perform(post("/search/region")
-        .content(om.writeValueAsString(dto))
+        .content(om.writeValueAsString(SearchRegionDTO.builder().region("강원도").build()))
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         ).andExpect(status().isOk());
     }
