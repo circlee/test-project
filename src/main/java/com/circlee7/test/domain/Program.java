@@ -8,6 +8,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Set;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import javax.persistence.EntityListeners;
 
 @Entity
 @Data
@@ -15,6 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
+@EntityListeners(AuditingEntityListener.class)
 public class Program extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 7358242943473807765L;

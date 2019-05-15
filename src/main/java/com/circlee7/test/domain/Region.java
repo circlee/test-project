@@ -9,6 +9,8 @@ import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import javax.persistence.EntityListeners;
 
 @Entity
 @Data
@@ -16,6 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
+@EntityListeners(AuditingEntityListener.class)
 public class Region implements Serializable {
 
 

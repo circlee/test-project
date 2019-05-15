@@ -20,6 +20,14 @@ public class QProgram extends EntityPathBase<Program> {
 
     public static final QProgram program = new QProgram("program");
 
+    public final QBaseEntity _super = new QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
+    //inherited
+    public final NumberPath<Long> createdBy = _super.createdBy;
+
     public final StringPath id = createString("id");
 
     public final StringPath prgmDescription = createString("prgmDescription");
@@ -33,6 +41,12 @@ public class QProgram extends EntityPathBase<Program> {
     public final StringPath serviceRegion = createString("serviceRegion");
 
     public final StringPath theme = createString("theme");
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+
+    //inherited
+    public final NumberPath<Long> updatedBy = _super.updatedBy;
 
     public QProgram(String variable) {
         super(Program.class, forVariable(variable));
